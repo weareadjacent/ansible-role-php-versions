@@ -40,16 +40,12 @@
   apt: update_cache=yes
   when: php_ondrej_debian_repo.changed and (ansible_distribution == "Debian")
 
-# PHP package purges.
+# PHP package purges (but only amongst those specified).
 - name: Purge PHP version packages.
   apt:
-    name: "{{ item }}"
+    name: "php{{ item }}-common"
     state: absent
     purge: yes
     force: yes
-  when: "'php' + php_version not in item"
-  with_items:
-    - php5.6-common
-    - php7.0-common
-    - php7.1-common
-    - php7.2-common
+  when: "item != php_version"
+  with_items: "{{ php_purge_versions }}"
